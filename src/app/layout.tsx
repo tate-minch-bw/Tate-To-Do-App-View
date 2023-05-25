@@ -1,10 +1,16 @@
 import './globals.css'
 import { Ubuntu } from 'next/font/google';
+import { Lexend_Deca } from 'next/font/google';
 
 const ubuntu = Ubuntu({
   weight: '400',
   subsets: ['latin'],
 });
+
+const lexend = Lexend_Deca({
+  weight:'300',
+  subsets: ['latin'],
+})
 
 export const metadata = {
   title: 'To Do Application',
@@ -18,7 +24,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={ubuntu.className}>{children}</body>
+      <body className={lexend.className}>{children}</body>
     </html>
   )
 }
