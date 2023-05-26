@@ -3,6 +3,7 @@ import axios from "axios"
 import React, {useEffect, useState} from 'react';
 import { TaskType, UserType } from "../types";
 import UserCard  from "../components/UserCard"
+import TaskCard from "../components/TaskCard"
 
 export default function Home(){
   const [users, setUsers] = useState<UserType[]>([]);
@@ -15,7 +16,10 @@ export default function Home(){
   },[]);
 
   const userClickHandler = (userId:number) => {
-    setSelectedUser(userId);
+    if(selectedUser === null || selectedUser !== userId)
+      setSelectedUser(userId);
+    else if (selectedUser === userId)
+      setSelectedUser(null);
   }
 
   const userCard = users.map((u) => {
@@ -23,12 +27,17 @@ export default function Home(){
   });
 
   const user = users.find((u) => u.id === selectedUser);
+
   let tasks:TaskType[];
-  if(user === undefined){
+
+  if(user === undefined)
     tasks = [];
-  }else{
+  else
     tasks = user.tasks;
-  }
+
+  const taskCard = tasks.map((t) => {
+    return <TaskCard key={t.id} task={t.task} id={t.id} />;
+  });
 
   return(
     <main>
@@ -50,8 +59,22 @@ export default function Home(){
               {userCard}
             </div>
           </div>
-          <div className="flex bg-gray-300 p-4 w-5/6 text-center text-black">
-            <span className= "mx-auto">{selectedUser !== null ? tasks.map((t) => <div key={t.id}>{t.task}</div>) : "Select a user to see their tasks"}</span>
+          <div className="flex bg-gray-300 p-4 w-5/6 text-center text-black relative">
+            {selectedUser !== null ? (
+              <div className="mx-auto">
+                <div className="mb-4 border-b-2 border-orange-500">
+                  <div>
+                  <span>Tasks</span>
+                  </div>
+                  <div className="p-2">
+                    <button className="p-2 bg-orange-500 text-white rounded-lg text-sm">Create a New Task</button>
+                  </div>
+                </div>
+                {taskCard}
+              </div>
+            ) : (
+              <span className="mx-auto">Select a user to see their tasks</span>
+            )}
           </div>
         </div>
       </div>
