@@ -55,7 +55,12 @@ export default function Home(){
         <div className="flex-grow flex">
           <div className="flex bg-gray-200 p-4 w-1/6 border-r border-gray-400">
             <div className="ml-4 flex flex-col">
-              <h2 className="text-lg text-black font-medium mt-0 mb-2 border-b-2 border-orange-500">User List</h2>
+              <div className="border-b-2 border-orange-500">
+                <h2 className="text-lg text-black font-medium mt-0 mb-2 text-center">User List</h2>
+                <div className="p-2 flex items-center">
+                    <button className="p-2 bg-orange-500 text-white rounded-lg text-sm">Create a New User</button>
+                  </div>
+              </div>
               {userCard}
             </div>
           </div>
