@@ -1,6 +1,6 @@
 'use client';
 import axios from "axios"
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useTransition} from 'react';
 import { TaskType, UserType } from "../types";
 import UserCard  from "../components/UserCard"
 import TaskCard from "../components/TaskCard"
@@ -15,28 +15,55 @@ export default function Home(){
     })
   },[]);
 
-  const userClickHandler = (userId:number) => {
+  const userSelector = (userId:number) => {
     if(selectedUser === null || selectedUser !== userId)
       setSelectedUser(userId);
     else if (selectedUser === userId)
       setSelectedUser(null);
   }
 
+  const deleteUserClickHandler = (userId:number) => {
+    axios.delete('http://localhost:8080/user/' + userId).then(res => {
+      setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+      setSelectedUser(null);
+    });
+  };
+
+  const deleteTaskClickHandler = (userId: number, taskId: number) => {
+    axios.delete('http://localhost:8080/user/' + userId + '/task/' + taskId).then(res => {
+      console.log(res.data);
+      setUsers(prevUsers =>
+        prevUsers.map(user =>
+          user.id === userId
+            ? {
+                ...user,
+                tasks: user.tasks.filter(task => task.id !== taskId),
+              }
+            : user
+        )
+      );
+    });
+  };
+
+
   const userCard = users.map((u) => {
-    return <UserCard key={u.id} name={u.name} id={u.id} setUserId={userClickHandler}/>;
+    return <UserCard key={u.id} name={u.name} id={u.id} setUserId={userSelector} deleteButton={deleteUserClickHandler}/>;
   });
 
   const user = users.find((u) => u.id === selectedUser);
 
   let tasks:TaskType[];
+  let userTasksId:number;
 
   if(user === undefined)
     tasks = [];
-  else
+  else{
     tasks = user.tasks;
+    userTasksId = user.id;
+  }
 
   const taskCard = tasks.map((t) => {
-    return <TaskCard key={t.id} task={t.task} id={t.id} />;
+    return <TaskCard key={t.id} task={t.task} taskId={t.id} userId={userTasksId} deleteButton={deleteTaskClickHandler} />;
   });
 
   return(
