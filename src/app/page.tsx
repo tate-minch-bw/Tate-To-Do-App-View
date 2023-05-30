@@ -85,8 +85,8 @@ export default function Home(){
               <div className="border-b-2 border-orange-500">
                 <h2 className="text-lg text-black font-medium mt-0 mb-2 text-center">User List</h2>
                 <div className="p-2 flex items-center">
-                    <button className="p-2 bg-orange-500 text-white rounded-lg text-sm">Create a New User</button>
-                  </div>
+                  <button className="p-2 bg-orange-500 text-white rounded-lg text-sm">Create a New User</button>
+                </div>
               </div>
               {userCard}
             </div>
@@ -96,7 +96,7 @@ export default function Home(){
               <div className="mx-auto">
                 <div className="mb-4 border-b-2 border-orange-500">
                   <div>
-                  <span>Tasks</span>
+                    <span>Tasks</span>
                   </div>
                   <div className="p-2">
                     <button className="p-2 bg-orange-500 text-white rounded-lg text-sm">Create a New Task</button>
