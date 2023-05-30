@@ -23,6 +23,5 @@ export default function TaskCard(props:propType){
             </button>
           </div>
         </div>
-  id:number;
-  task:string;
+      );
 }
