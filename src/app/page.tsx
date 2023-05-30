@@ -32,8 +32,8 @@ export default function Home(){
   const deleteTaskClickHandler = (userId: number, taskId: number) => {
     axios.delete('http://localhost:8080/user/' + userId + '/task/' + taskId).then(res => {
       console.log(res.data);
-      setUsers(prevUsers =>
-        prevUsers.map(user =>
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
           user.id === userId
             ? {
                 ...user,
@@ -44,7 +44,6 @@ export default function Home(){
       );
     });
   };
-
 
   const userCard = users.map((u) => {
     return <UserCard key={u.id} name={u.name} id={u.id} setUserId={userSelector} deleteButton={deleteUserClickHandler}/>;
