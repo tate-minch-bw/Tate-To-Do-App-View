@@ -8,6 +8,9 @@ import TaskCard from "../components/TaskCard"
 export default function Home(){
   const [users, setUsers] = useState<UserType[]>([]);
   const [selectedUser, setSelectedUser] = useState<number | null>(null);
+  const [enteredUsername, setEnteredUsername] = useState<string>("");
+  const [enteredEmail, setEnteredEmail] = useState<string>("");
+  const [showNewUserForm, setShowNewUserForm] = useState<boolean>(false);
 
   useEffect(()=> {
     axios.get('http://localhost:8080/users').then(res => {
@@ -45,6 +48,40 @@ export default function Home(){
     });
   };
 
+  const createNewUserHandler:React.MouseEventHandler<HTMLButtonElement> = (e) => {
+    setShowNewUserForm(true);
+  };
+
+  const createNewUserSubmit:React.MouseEventHandler<HTMLButtonElement> = (e) => {
+    if(enteredUsername !== "" && enteredEmail !== ""){
+      const userData = {
+        name:enteredUsername,
+        email:enteredEmail,
+      };
+      axios.post('http://localhost:8080/user', userData).then(res => {
+        console.log(res);
+        setUsers((prevUsers) => [...prevUsers, res.data]);
+        setEnteredEmail("");
+        setEnteredUsername("");
+      });
+    }
+    setShowNewUserForm(false);
+  };
+  
+  const createNewUserCancel:React.MouseEventHandler<HTMLButtonElement> = (e) => {
+    setShowNewUserForm(false);
+    setEnteredEmail("");
+    setEnteredUsername("");
+  }
+
+  const usernameHandler:React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    setEnteredUsername(e.target.value);
+  };
+
+  const emailHandler:React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    setEnteredEmail(e.target.value);
+  };
+
   const userCard = users.map((u) => {
     return <UserCard key={u.id} name={u.name} id={u.id} setUserId={userSelector} deleteButton={deleteUserClickHandler}/>;
   });
@@ -67,7 +104,25 @@ export default function Home(){
 
   return(
     <main>
-      <div className="flex flex-col h-screen">
+      <div className="flex flex-col h-screen relative">
+          <div className={`bg-gray-500 bg-opacity-75 z-10 absolute inset-0 flex items-center justify-center ${showNewUserForm ? "" : "hidden"}`}>
+            <div className="bg-white text-black drop-shadow-lg rounded-lg p-2">
+              <button className="absolute top-0 right-0 m-2 text-gray-600 hover:text-gray-800" onClick={createNewUserCancel}>
+                <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <div className="flex m-2">
+                <div className="mr-2">username:</div>
+                <input className="border border-gray-500 rounded-lg px-2" type="text" value={enteredUsername} onChange={usernameHandler}/>
+              </div>
+              <div className="flex m-2">
+                <div className="mr-2">email:</div>
+                <input className="border border-gray-500 rounded-lg px-2" type="text" value={enteredEmail} onChange={emailHandler}/>
+              </div>
+              <button onClick={createNewUserSubmit} className="ml-2 bg-orange-500 text-white rounded-lg text-sm">submit</button>
+          </div>
+        </div>
         <div className="bg-gradient-to-l from-black to-gray-600 p-4 text-left">
           <div className="flex justify-between items-center">
             <h1 className="text-3xl font-bold text-white py-2 px-4 mb-2">TodoManager</h1>
@@ -84,7 +139,7 @@ export default function Home(){
               <div className="border-b-2 border-orange-500">
                 <h2 className="text-lg text-black font-medium mt-0 mb-2 text-center">User List</h2>
                 <div className="p-2 flex items-center">
-                  <button className="p-2 bg-orange-500 text-white rounded-lg text-sm">Create a New User</button>
+                  <button className="p-2 bg-orange-500 text-white rounded-lg text-sm" onClick={createNewUserHandler}>Create a New User</button>
                 </div>
               </div>
               {userCard}
