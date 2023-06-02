@@ -10,7 +10,9 @@ export default function Home(){
   const [selectedUser, setSelectedUser] = useState<number | null>(null);
   const [enteredUsername, setEnteredUsername] = useState<string>("");
   const [enteredEmail, setEnteredEmail] = useState<string>("");
+  const [enteredTask, setEnteredTask] = useState<string>("");
   const [showNewUserForm, setShowNewUserForm] = useState<boolean>(false);
+  const [showNewTaskForm, setShowNewTaskForm] = useState<boolean>(false);
 
   useEffect(()=> {
     axios.get('http://localhost:8080/users').then(res => {
@@ -52,6 +54,10 @@ export default function Home(){
     setShowNewUserForm(true);
   };
 
+  const createNewTaskHandler:React.MouseEventHandler<HTMLButtonElement> = (e) => {
+    setShowNewTaskForm(true);
+  };
+
   const createNewUserSubmit:React.MouseEventHandler<HTMLButtonElement> = (e) => {
     if(enteredUsername !== "" && enteredEmail !== ""){
       const userData = {
@@ -67,11 +73,39 @@ export default function Home(){
     }
     setShowNewUserForm(false);
   };
+
+  const createNewTaskSubmit:React.MouseEventHandler<HTMLButtonElement> = (e) => {
+    if(enteredTask !== ""){
+      const taskData = {
+        task:enteredTask,
+      };
+      axios.post(`http://localhost:8080/user/${selectedUser}/task`, taskData).then(res => {
+        console.log(res);
+        setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === selectedUser
+            ? {
+                ...user,
+                tasks: [...user.tasks, res.data],
+              }
+            : user
+          )
+        );
+        setEnteredTask("");
+      });
+    }
+    setShowNewTaskForm(false);
+  };
   
   const createNewUserCancel:React.MouseEventHandler<HTMLButtonElement> = (e) => {
     setShowNewUserForm(false);
     setEnteredEmail("");
     setEnteredUsername("");
+  }
+
+  const createNewTaskCancel:React.MouseEventHandler<HTMLButtonElement> = (e) => {
+    setShowNewTaskForm(false);
+    setEnteredTask("");
   }
 
   const usernameHandler:React.ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -80,6 +114,10 @@ export default function Home(){
 
   const emailHandler:React.ChangeEventHandler<HTMLInputElement> = (e) => {
     setEnteredEmail(e.target.value);
+  };
+
+  const taskHandler:React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    setEnteredTask(e.target.value);
   };
 
   const userCard = users.map((u) => {
@@ -123,6 +161,20 @@ export default function Home(){
               <button onClick={createNewUserSubmit} className="ml-2 bg-orange-500 text-white rounded-lg text-sm">submit</button>
           </div>
         </div>
+          <div className={`bg-gray-500 bg-opacity-75 z-10 absolute inset-0 flex items-center justify-center ${showNewTaskForm ? "" : "hidden"}`}>
+            <div className="bg-white text-black drop-shadow-lg rounded-lg p-2">
+              <button className="absolute top-0 right-0 m-2 text-gray-600 hover:text-gray-800" onClick={createNewTaskCancel}>
+                <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <div className="flex m-2">
+                <div className="mr-2">task:</div>
+                <input className="border border-gray-500 rounded-lg px-2" type="text" value={enteredTask} onChange={taskHandler}/>
+              </div>
+              <button onClick={createNewTaskSubmit} className="ml-2 bg-orange-500 text-white rounded-lg text-sm">submit</button>
+          </div>
+        </div>
         <div className="bg-gradient-to-l from-black to-gray-600 p-4 text-left">
           <div className="flex justify-between items-center">
             <h1 className="text-3xl font-bold text-white py-2 px-4 mb-2">TodoManager</h1>
@@ -153,7 +205,7 @@ export default function Home(){
                     <span>Tasks</span>
                   </div>
                   <div className="p-2">
-                    <button className="p-2 bg-orange-500 text-white rounded-lg text-sm">Create a New Task</button>
+                    <button className="p-2 bg-orange-500 text-white rounded-lg text-sm" onClick={createNewTaskHandler}>Create a New Task</button>
                   </div>
                 </div>
                 {taskCard}
